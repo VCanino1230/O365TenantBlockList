@@ -1,0 +1,22 @@
+Connect-ExchangeOnline
+$entry_note_date = Get-Date -Format "MM/dd/yyyy"
+$domain_list = @()
+$sender_address_list = @()
+Import-Csv -Path "<insert file path to .csv" | ForEach-Object {
+    $domain_list += $_.Domains
+    $sender_address_list += $_.EAddress
+}
+
+Write-Host "Checking the Domain List Entries..." -BackgroundColor "White" -ForegroundColor "Blue"
+foreach($ditem in $domain_list){
+    Write-Verbose "Adding $ditem to Block List" -Verbose
+    New-TenantAllowBlockListItems -ListType Sender -Block -Entries $ditem -NoExpiration -Notes "Block Entry $entry_note_date"
+    Start-Sleep -Milliseconds 3000
+}
+
+Write-Host "Checking the Sender Address List Entries..." -BackgroundColor "White" -ForegroundColor "Blue"
+foreach($eitem in $sender_address_list){
+    Write-Verbose "Adding $eitem to Block List" -Verbose
+    New-TenantAllowBlockListItems -ListType Sender -Block -Entries $eitem -NoExpiration -Notes "Block Entry $entry_note_date"
+    Start-Sleep -Milliseconds 3000
+}
